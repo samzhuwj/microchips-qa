@@ -2,11 +2,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.optimize as opt
 
-from plotData import *
-import costFunctionReg as cfr
-import plotDecisionBoundary as pdb
-import predict as predict
-import mapFeature as mf
+from plotData import plot_data
+from costFunctionReg import cost_function_reg
+from plotDecisionBoundary import plot_decision_boundary
+from predict import predict
+from mapFeature import map_feature
 
 
 plt.ion()
@@ -15,9 +15,7 @@ plt.ion()
 data = np.loadtxt('ex2data2.txt', delimiter=',')
 X = data[:, 0:2]
 y = data[:, 2]
-
 plot_data(X, y)
-
 plt.xlabel('Microchip Test 1')
 plt.ylabel('Microchip Test 2')
 plt.legend(['y = 1', 'y = 0'])
@@ -38,7 +36,7 @@ input('Program paused. Press ENTER to continue')
 
 # Note that mapFeature also adds a column of ones for us, so the intercept
 # term is handled
-X = mf.map_feature(X[:, 0], X[:, 1])
+X = map_feature(X[:, 0], X[:, 1])
 
 # Initialize fitting parameters
 initial_theta = np.zeros(X.shape[1])
@@ -47,9 +45,9 @@ initial_theta = np.zeros(X.shape[1])
 lmd = 1
 
 # Compute and display initial cost and gradient for regularized logistic regression
-cost, grad = cfr.cost_function_reg(initial_theta, X, y, lmd)
-
+cost, grad = cost_function_reg(initial_theta, X, y, lmd)
 np.set_printoptions(formatter={'float': '{: 0.4f}\n'.format})
+
 print('Cost at initial theta (zeros): {}'.format(cost))
 print('Expected cost (approx): 0.693')
 print('Gradient at initial theta (zeros) - first five values only: \n{}'.format(grad[0:5]))
@@ -59,8 +57,7 @@ input('Program paused. Press ENTER to continue')
 
 # Compute and display cost and gradient with non-zero theta
 test_theta = np.ones(X.shape[1])
-
-cost, grad = cfr.cost_function_reg(test_theta, X, y, lmd)
+cost, grad = cost_function_reg(test_theta, X, y, lmd)
 
 print('Cost at test theta: {}'.format(cost))
 print('Expected cost (approx): 2.13')
@@ -89,23 +86,23 @@ lmd = 1
 
 # Optimize
 def cost_func(t):
-    return cfr.cost_function_reg(t, X, y, lmd)[0]
+    return cost_function_reg(t, X, y, lmd)[0]
 
 def grad_func(t):
-    return cfr.cost_function_reg(t, X, y, lmd)[1]
+    return cost_function_reg(t, X, y, lmd)[1]
 
 theta, cost, *unused = opt.fmin_bfgs(f=cost_func, fprime=grad_func, x0=initial_theta, maxiter=400, full_output=True, disp=False)
 
 # Plot boundary
 print('Plotting decision boundary ...')
-pdb.plot_decision_boundary(theta, X, y)
-plt.title('lambda = {}'.format(lmd))
 
+plot_decision_boundary(theta, X, y)
+plt.title('lambda = {}'.format(lmd))
 plt.xlabel('Microchip Test 1')
 plt.ylabel('Microchip Test 2')
 
 # Compute accuracy on our training set
-p = predict.predict(theta, X)
+p = predict(theta, X)
 
 print('Train Accuracy: {:0.4f}'.format(np.mean(y == p) * 100))
 print('Expected accuracy (with lambda = 1): 83.1 (approx)')
